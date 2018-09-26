@@ -4,12 +4,16 @@ server:
     session:
       cookie:
         name: UISESSIONCOUPON
+  context-path: /order
+
 security:
   oauth2:
     client:
       client-id: app
       client-secret: 123456
-      access-token-uri: http://localhost:8080/oauth/token
-      user-authorization-uri: http://localhost:8080/oauth/authorize
+      access-token-uri: http://localhost:8080/auth/oauth/token
+      user-authorization-uri: http://localhost:8080/auth/oauth/authorize
     resource:
-      user-info-uri: http://localhost:8080/user
+      userInfoUri: http://localhost:8080/auth/user
+
+#      user-info-uri: http://localhost:8080/auth/user

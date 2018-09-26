@@ -1,15 +1,17 @@
 package com.cf.cloud.auth.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
 
-//@Configuration
-//@EnableAuthorizationServer
+@Configuration
+@EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
     /**
      * 配置授权服务器的安全，意味着实际上是/oauth/token端点。
@@ -18,6 +20,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+        //允许表单认证
+        security
+                .allowFormAuthenticationForClients()
+
+        ;
         super.configure(security);
     }
 
@@ -30,6 +37,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory().withClient("app")
                 .authorizedGrantTypes("authorization_code", "refresh_token")
+                .scopes("*")
                 .secret("123456")
         ;
     }
@@ -40,6 +48,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        endpoints
+                .tokenStore(new InMemoryTokenStore())
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         super.configure(endpoints);
     }
 }
