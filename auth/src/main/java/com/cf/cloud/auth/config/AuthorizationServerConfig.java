@@ -37,7 +37,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory().withClient("app")
                 .authorizedGrantTypes("authorization_code", "refresh_token")
-                .scopes("*")
+                .scopes("read")
+                .autoApprove("read")
                 .secret("123456")
         ;
     }

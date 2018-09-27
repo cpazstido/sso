@@ -15,5 +15,3 @@ security:
       user-authorization-uri: http://localhost:8080/auth/oauth/authorize
     resource:
       userInfoUri: http://localhost:8080/auth/user
-
-#      user-info-uri: http://localhost:8080/auth/user
