@@ -1,18 +1,22 @@
-package com.cf.cloud.auth.config;
+package com.cf.cloud.auth.other.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 
-//@Configuration
-//@EnableAuthorizationServer
+@Configuration
+@EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+    @Resource
+    private DataSource dataSource;
+
     /**
      * 配置授权服务器的安全，意味着实际上是/oauth/token端点。
      * /oauth/authorize端点也应该是安全的
@@ -20,11 +24,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-        //允许表单认证
-        security
-                .allowFormAuthenticationForClients()
-
-        ;
         super.configure(security);
     }
 
@@ -35,13 +34,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().withClient("app")
-                .authorizedGrantTypes("authorization_code", "refresh_token")
-                .scopes("read")
-                .autoApprove("read")
-                .secret("123456")
-                .redirectUris("http://localhost:8081/order/login")
-        ;
+        clients.jdbc(dataSource);
     }
 
     /**
@@ -50,9 +43,6 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        endpoints
-                .tokenStore(new InMemoryTokenStore())
-                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);
         super.configure(endpoints);
     }
 }
