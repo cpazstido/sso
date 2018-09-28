@@ -28,7 +28,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .formLogin().permitAll().defaultSuccessUrl("/index")
                 .and()
-                .logout().logoutSuccessUrl("http://www.baidu.com")
+                .logout().logoutSuccessUrl("http://localhost:8081/order/index")
                 .and()
 //                .requestMatchers()
 //                .antMatchers("/", "/login", "/oauth/authorize", "/oauth/confirm_access", "/exit")
