@@ -9,7 +9,7 @@ server:
 security:
   oauth2:
     client:
-      client-id: MemberSystem
+      client-id: app
       client-secret: 12345
       access-token-uri: http://localhost:8080/auth/oauth/token
       user-authorization-uri: http://localhost:8080/auth/oauth/authorize

@@ -1,6 +1,7 @@
 package com.cf.cloud.auth.other.config;
 
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -34,7 +35,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.jdbc(dataSource);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        clients.inMemory().withClient("app")
+                .authorizedGrantTypes("authorization_code", "refresh_token")
+                .scopes("read")
+                .autoApprove("read")
+                .secret(encoder.encode("12345"))
+                .redirectUris("http://localhost:8081/order/login")
+        ;
     }
 
     /**
