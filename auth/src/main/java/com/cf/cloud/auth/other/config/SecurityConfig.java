@@ -50,11 +50,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        auth.userDetailsService(myUserDetailsService).passwordEncoder(passwordEncoder());
 //    }
 //
-//    @Bean
-//    @Override
-//    public AuthenticationManager authenticationManager() throws Exception {
-//        return super.authenticationManager();
-//    }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 //
 //    @Bean
 //    public PasswordEncoder passwordEncoder() {

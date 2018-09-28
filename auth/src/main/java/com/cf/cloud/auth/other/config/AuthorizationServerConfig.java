@@ -1,12 +1,18 @@
 package com.cf.cloud.auth.other.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 import javax.annotation.Resource;
 import javax.sql.DataSource;
@@ -15,8 +21,15 @@ import javax.sql.DataSource;
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
     @Resource
     private DataSource dataSource;
+    @Autowired
+    RedisConnectionFactory redisConnectionFactory;
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     /**
      * 配置授权服务器的安全，意味着实际上是/oauth/token端点。
@@ -37,11 +50,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         clients.inMemory().withClient("app")
-                .authorizedGrantTypes("authorization_code", "refresh_token")
+                .authorizedGrantTypes("client_credentials","password","authorization_code", "refresh_token")
                 .scopes("read")
                 .autoApprove("read")
                 .secret(encoder.encode("12345"))
                 .redirectUris("http://localhost:8081/order/login")
+                .accessTokenValiditySeconds(60)
+                .accessTokenValiditySeconds(15)
         ;
     }
 
@@ -51,6 +66,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
      */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-        super.configure(endpoints);
+        endpoints
+                .tokenStore(new RedisTokenStore(redisConnectionFactory))
+                .authenticationManager(authenticationManager)//使用password必须指定authenticationManager
+                .userDetailsService(userDetailsService)
+                .allowedTokenEndpointRequestMethods(HttpMethod.GET, HttpMethod.POST);;
     }
 }
